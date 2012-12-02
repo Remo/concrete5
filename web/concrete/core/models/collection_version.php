@@ -69,7 +69,7 @@
 			Events::fire('on_page_version_refresh_cache', $this);
 		}
 		
-		public function get(&$c, $cvID) {
+		public function get(&$c, $cvID, $autoloadAttributes = true) {
 			if (is_string($cvID)) {
 				$cvID = CollectionVersion::getNumericalVersionID($c->getCollectionID(), $cvID);
 			}
@@ -89,8 +89,14 @@
 			}
 			
 			// load the attributes for a particular version object
-			Loader::model('attribute/categories/collection');			
-			$cv->attributes = CollectionAttributeKey::getAttributes($c->getCollectionID(), $cvID);
+			Loader::model('attribute/categories/collection');
+
+                        if ($autoloadAttributes) {
+                            $cv->attributes = CollectionAttributeKey::getAttributes($c->getCollectionID(), $cvID);
+                        }
+                        else {
+                            $cv->attributes = new AttributeValueList(false, $c->getCollectionID(), $cvID);
+                        }
 			
 			$cv->cID = $c->getCollectionID();			
 			$cv->cvIsMostRecent = $cv->_checkRecent();

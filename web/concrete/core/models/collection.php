@@ -28,9 +28,9 @@ defined('C5_EXECUTE') or die("Access Denied.");
 		protected $attributes = array();
 		/* version specific stuff */
 
-		function loadVersionObject($cvID = "ACTIVE") {
+		function loadVersionObject($cvID = "ACTIVE", $autoloadAttributes = true) {
 			$cvID = CollectionVersion::getNumericalVersionID($this->getCollectionID(), $cvID);
-			$this->vObj = CollectionVersion::get($this, $cvID);
+			$this->vObj = CollectionVersion::get($this, $cvID, $autoloadAttributes);
 			$vp = new Permissions($this->vObj);			
 			return $vp;
 		}

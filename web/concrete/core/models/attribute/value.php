@@ -7,23 +7,42 @@ defined('C5_EXECUTE') or die("Access Denied.");
 class Concrete5_Model_AttributeValueList extends Object implements Iterator {
 		
 	private $attributes = array();
+        private $cID;
+        private $cvID;
 	
 	public function addAttributeValue($ak, $value) {
 		$this->attributes[$ak->getAttributeKeyHandle()] = $value;
 	}
 	
-	public function __construct($array = false) {
+	public function __construct($array = false, $cID = null, $cvID = null) {
 		if (is_array($array)) {
 			$this->attributes = $array;
 		}
+                $this->cID = $cID;
+                $this->cvID = $cvID;
 	}
 	
 	public function count() {
 		return count($this->attributes);
 	}
 	
-	public function getAttribute($akHandle) {
-		return $this->attributes[$akHandle];
+	public function getAttribute($akHandle, $method = 'getValue') {
+                if (!array_key_exists($akHandle, $this->attributes)) {
+                    die('a');
+                    $db = Loader::db();
+                    $values = $db->GetAll("select cav.akID, cav.avID
+                        from CollectionAttributeValues cav
+                        inner join AttributeKeys ak ON ak.akID=cav.akID
+                        where cav.cID = ? and cav.cvID = ? and ak.akHandle = ?", array($this->cID, $this->cvID, $akHandle));
+                    foreach($values as $val) {
+                            $ak = CollectionAttributeKey::getByID($val['akID']);
+                            if (is_object($ak)) {
+                                    $value = $ak->getAttributeValue($val['avID'], $method);
+                                    $this->addAttributeValue($ak, $value);
+                            }
+                    }                                        
+                }
+                return $this->attributes[$akHandle];
 	}
 	
 	public function rewind() {

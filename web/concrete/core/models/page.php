@@ -36,7 +36,7 @@ class Concrete5_Model_Page extends Collection {
 	 * @param string $class
 	 * @return Page
 	 */
-	public static function getByID($cID, $versionOrig = 'RECENT', $class = 'Page') {
+	public static function getByID($cID, $versionOrig = 'RECENT', $class = 'Page', $autoloadAttributes = true) {
 		
 		if ($versionOrig == 'RECENT' || $versionOrig == 'ACTIVE') {
 			$c = Cache::get(strtolower($class . '_' . $versionOrig), $cID);
@@ -48,7 +48,7 @@ class Concrete5_Model_Page extends Collection {
 		$version = CollectionVersion::getNumericalVersionID($cID, $versionOrig);
 		$where = "where Pages.cID = ?";
 		$c = new $class;
-		$c->populatePage($cID, $where, $version);
+		$c->populatePage($cID, $where, $version, $autoloadAttributes);
  
 		// must use cID instead of c->getCollectionID() because cID may be the pointer to another page		
 		if ($versionOrig == 'RECENT' || $versionOrig == 'ACTIVE') {
@@ -99,7 +99,7 @@ class Concrete5_Model_Page extends Collection {
 	/**
 	 * @access private
 	 */
-	protected function populatePage($cInfo, $where, $cvID) {
+	protected function populatePage($cInfo, $where, $cvID, $autoloadAttributes = true) {
 		$db = Loader::db();
                 
                 $this->populatePageObject($cInfo, $where, $r, $row);
@@ -130,7 +130,7 @@ class Concrete5_Model_Page extends Collection {
 			$this->loadPermissionAssignments();
 			if ($cvID != false) {
 				// we don't do this on the front page
-				$this->loadVersionObject($cvID);
+				$this->loadVersionObject($cvID, $autoloadAttributes);
 			}
 		}		
 		unset($r);
