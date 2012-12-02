@@ -134,11 +134,7 @@ class Concrete5_Model_PageList extends DatabaseItemList {
 		}
 		$activePDIDs[] = 0;
 
-		if ($this->includeAliases) {
-			$cInheritPermissionsFromCID = 'if(p2.cID is null, p1.cInheritPermissionsFromCID, p2.cInheritPermissionsFromCID)';
-		} else {
-			$cInheritPermissionsFromCID = 'p1.cInheritPermissionsFromCID';
-		}
+		$cInheritPermissionsFromCID = 'PagesOriginal.cInheritPermissionsFromCID';
 
 		if ($this->displayOnlyApprovedPages) {
 			$cvIsApproved = ' and cv.cvIsApproved = 1';
@@ -150,10 +146,10 @@ class Concrete5_Model_PageList extends DatabaseItemList {
 		}
 		
 		$this->filter(false, "((select count(cID) from PagePermissionAssignments ppa1 inner join PermissionAccessList pa1 on ppa1.paID = pa1.paID where ppa1.cID = {$cInheritPermissionsFromCID} and pa1.accessType = " . PermissionKey::ACCESS_TYPE_INCLUDE . " and pa1.pdID in (" . implode(',', $activePDIDs) . ")
-			and pa1.peID in (" . implode(',', $peIDs) . ") and (if(pa1.peID = " . $owpae->getAccessEntityID() . " and p1.uID <>" . $uID . ", false, true)) and (ppa1.pkID = " . $vpPKID . $cvIsApproved . " or ppa1.pkID = " . $vpvPKID . ")) > 0
-			or (p1.cPointerExternalLink !='' AND p1.cPointerExternalLink IS NOT NULL))");
+			and pa1.peID in (" . implode(',', $peIDs) . ") and (if(pa1.peID = " . $owpae->getAccessEntityID() . " and PagesOriginal.uID <>" . $uID . ", false, true)) and (ppa1.pkID = " . $vpPKID . $cvIsApproved . " or ppa1.pkID = " . $vpvPKID . ")) > 0
+			or (PagesOriginal.cPointerExternalLink !='' AND PagesOriginal.cPointerExternalLink IS NOT NULL))");
 		$this->filter(false, "((select count(cID) from PagePermissionAssignments ppaExclude inner join PermissionAccessList paExclude on ppaExclude.paID = paExclude.paID where ppaExclude.cID = {$cInheritPermissionsFromCID} and accessType = " . PermissionKey::ACCESS_TYPE_EXCLUDE . " and pdID in (" . implode(',', $activePDIDs) . ")
-			and paExclude.peID in (" . implode(',', $peIDs) . ") and (if(paExclude.peID = " . $owpae->getAccessEntityID() . " and p1.uID <>" . $uID . ", false, true)) and (ppaExclude.pkID = " . $vpPKID . $cvIsApproved . " or ppaExclude.pkID = " . $vpvPKID . ")) = 0)");		
+			and paExclude.peID in (" . implode(',', $peIDs) . ") and (if(paExclude.peID = " . $owpae->getAccessEntityID() . " and PagesOriginal.uID <>" . $uID . ", false, true)) and (ppaExclude.pkID = " . $vpPKID . $cvIsApproved . " or ppaExclude.pkID = " . $vpvPKID . ")) = 0)");		
 	}
 
 	public function sortByRelevance() {
@@ -167,18 +163,18 @@ class Concrete5_Model_PageList extends DatabaseItemList {
 	 * Sorts this list by display order 
 	 */
 	public function sortByDisplayOrder() {
-		parent::sortBy('p1.cDisplayOrder', 'asc');
+		parent::sortBy('PagesOriginal.cDisplayOrder', 'asc');
 	}
 	
 	/** 
 	 * Sorts this list by display order descending 
 	 */
 	public function sortByDisplayOrderDescending() {
-		parent::sortBy('p1.cDisplayOrder', 'desc');
+		parent::sortBy('PagesOriginal.cDisplayOrder', 'desc');
 	}
 
 	public function sortByCollectionIDAscending() {
-		parent::sortBy('p1.cID', 'asc');
+		parent::sortBy('PagesOriginal.cID', 'asc');
 	}
 	
 	/** 
@@ -224,10 +220,10 @@ class Concrete5_Model_PageList extends DatabaseItemList {
 				$cth .= $db->quote($cParentID[$i]);
 			}
 			$cth .= ')';
-			$this->filter(false, "(p1.cParentID in {$cth})");
+			$this->filter(false, "(PagesOriginal.cParentID in {$cth})");
 		} else {
 			$this->filterByCParentID = $cParentID;
-			$this->filter('p1.cParentID', $cParentID);
+			$this->filter('PagesOriginal.cParentID', $cParentID);
 		}
 	}
 	
@@ -245,11 +241,7 @@ class Concrete5_Model_PageList extends DatabaseItemList {
 	 * @param mixed $ctID
 	 */
 	public function filterByUserID($uID) {
-		if ($this->includeAliases) {
-			$this->filter(false, "(p1.uID = $uID or p2.uID = $uID)");
-		} else {
-			$this->filter('p1.uID', $uID);
-		}
+		$this->filter('PagesOriginal.uID', $uID);
 	}
 
 	public function filterByIsApproved($cvIsApproved) {
@@ -258,10 +250,10 @@ class Concrete5_Model_PageList extends DatabaseItemList {
 	
 	public function filterByIsAlias($ia) {
 		if ($this->includeAliases) {
-			if ($ia == true) {
-				$this->filter(false, "(p2.cPointerID is not null)");
+			if ($ia) {
+				$this->filter(false, "(Pages.cPointerID > 0)");
 			} else {
-				$this->filter(false, "(p2.cPointerID is null)");
+				$this->filter(false, "(Pages.cPointerID is null OR Pages.cPointerID < 1)");
 			}
 		}
 	}
@@ -300,11 +292,7 @@ class Concrete5_Model_PageList extends DatabaseItemList {
 		if (!Loader::helper('validation/numbers')->integer($num)) {
 			$num = 0;
 		}
-		if ($this->includeAliases) {
-			$this->filter(false, '(p1.cChildren ' . $comparison . ' ' . $num . ' or p2.cChildren ' . $comparison . ' ' . $num . ')');
-		} else {
-			$this->filter('p1.cChildren', $num, $comparison);
-		}
+		$this->filter('PagesOriginal.cChildren', $num, $comparison);
 	}
 
 	public function filterByDateLastModified($date, $comparison = '=') {
@@ -338,7 +326,7 @@ class Concrete5_Model_PageList extends DatabaseItemList {
 		}
 	
 		if (!$this->includeAliases) {
-			$this->filter(false, '(p1.cPointerID < 1 or p1.cPointerID is null)');
+			$this->filter(false, '(Pages.cPointerID < 1 or Pages.cPointerID is null)');
 		}
 		
 		$cvID = '(select max(cvID) from CollectionVersions where cID = cv.cID)';		
@@ -347,28 +335,49 @@ class Concrete5_Model_PageList extends DatabaseItemList {
 			$this->filter('cvIsApproved', 1);
 		}
 
-		if ($this->includeAliases) {
-			$this->setQuery('select p1.cID, pt.ctHandle ' . $ik . $additionalFields . ' from Pages p1 left join Pages p2 on (p1.cPointerID = p2.cID) left join PagePaths on (PagePaths.cID = p1.cID and PagePaths.ppIsCanonical = 1) left join PageSearchIndex psi on (psi.cID = if(p2.cID is null, p1.cID, p2.cID)) inner join CollectionVersions cv on (cv.cID = if(p2.cID is null, p1.cID, p2.cID) and cvID = ' . $cvID . ') left join PageTypes pt on pt.ctID = cv.ctID inner join Collections c on (c.cID = if(p2.cID is null, p1.cID, p2.cID))');
-		} else {
-			$this->setQuery('select p1.cID, pt.ctHandle ' . $ik . $additionalFields . ' from Pages p1 left join PagePaths on (PagePaths.cID = p1.cID and PagePaths.ppIsCanonical = 1) left join PageSearchIndex psi on (psi.cID = p1.cID) inner join CollectionVersions cv on (cv.cID = p1.cID and cvID = ' . $cvID . ') left join PageTypes pt on (pt.ctID = cv.ctID)  inner join Collections c on (c.cID = p1.cID)');
-		}
+                $this->setQuery('
+                    SELECT
+                        PagesOriginal.cID,
+                        PagesOriginal.pkgID,
+                        Pages.cPointerID,
+                        if(Pages.cPointerID>0,Pages.cID,null) cPointerOriginalID,
+                        PagesOriginal.cPointerExternalLink,
+                        PagesOriginal.cIsActive,
+                        PagesOriginal.cIsSystemPage,
+                        PagesOriginal.cPointerExternalLinkNewWindow,
+                        PagesOriginal.cFilename,
+                        Collections.cDateAdded,
+                        PagesOriginal.cDisplayOrder,
+                        Collections.cDateModified,
+                        PagesOriginal.cInheritPermissionsFromCID, 
+                        PagesOriginal.cInheritPermissionsFrom, 
+                        PagesOriginal.cOverrideTemplatePermissions, 
+                        PagesOriginal.cCheckedOutUID, 
+                        PagesOriginal.cIsTemplate, 
+                        PagesOriginal.uID, 
+                        PagePaths.cPath, 
+                        PagesOriginal.cParentID, 
+                        PagesOriginal.cChildren, 
+                        PagesOriginal.cCacheFullPageContent, PagesOriginal.cCacheFullPageContentOverrideLifetime, 
+                        PagesOriginal.cCacheFullPageContentLifetimeCustom,
+                        pt.ctHandle,
+                        cv.*
+                    FROM Pages 
+                    INNER JOIN Pages PagesOriginal ON if(Pages.cPointerID>0,Pages.cPointerID, Pages.cID)=PagesOriginal.cID
+                    INNER JOIN Collections ON PagesOriginal.cID = Collections.cID
+                    INNER JOIN CollectionVersions cv ON cv.cID = PagesOriginal.cID AND cv.cvID = ' . $cvID . '
+                    LEFT JOIN PageSearchIndex psi ON psi.cID = PagesOriginal.cID
+                    LEFT JOiN PageTypes pt ON pt.ctID = cv.ctID
+                    LEFT JOIN PagePaths ON PagesOriginal.cID = PagePaths.cID AND PagePaths.ppIsCanonical = 1
+                ');
+                
+                $this->filter('PagesOriginal.cIsTemplate', 0);
+                $this->setupPermissions();
 		
-		if ($this->includeAliases) {
-			$this->filter(false, "(p1.cIsTemplate = 0 or p2.cIsTemplate = 0)");
-		} else {
-			$this->filter('p1.cIsTemplate', 0);
-		}
-		
-		$this->setupPermissions();
-		
-		if ($this->includeAliases) {
-			$this->setupAttributeFilters("left join CollectionSearchIndexAttributes on (CollectionSearchIndexAttributes.cID = if (p2.cID is null, p1.cID, p2.cID))");
-		} else {
-			$this->setupAttributeFilters("left join CollectionSearchIndexAttributes on (CollectionSearchIndexAttributes.cID = p1.cID)");
-		}
-		
+		$this->setupAttributeFilters("left join CollectionSearchIndexAttributes on (CollectionSearchIndexAttributes.cID = PagesOriginal.cID)");		
+                    
 		if ($this->displayOnlyActivePages) {
-			$this->filter('p1.cIsActive', 1);
+			$this->filter('PagesOriginal.cIsActive', 1);
 		}
 		$this->setupSystemPagesToExclude();
 		
@@ -378,17 +387,9 @@ class Concrete5_Model_PageList extends DatabaseItemList {
 		if ($this->includeSystemPages || $this->filterByCParentID > 1 || $this->filterByCT == true) {
 			return false;
 		}
-		if ($this->includeAliases) {
-			$this->filter(false, "(p1.cIsSystemPage = 0 or p2.cIsSystemPage = 0)");	
-		} else {
-			$this->filter(false, "(p1.cIsSystemPage = 0)");	
-		}
+		$this->filter(false, "(PagesOriginal.cIsSystemPage = 0)");	
 	}
-	
-	protected function loadPageID($cID, $versionOrig = 'RECENT') {
-		return Page::getByID($cID, $versionOrig);
-	}
-	
+		
 	public function getTotal() {
 		if ($this->getQuery() == '') {
 			$this->setBaseQuery();
@@ -409,8 +410,12 @@ class Concrete5_Model_PageList extends DatabaseItemList {
 		
 		$r = parent::get($itemsToGet, $offset);
 		foreach($r as $row) {
-			$nc = $this->loadPageID($row['cID'], 'ACTIVE');
-			if (!$this->displayOnlyApprovedPages) {
+        		$nc = new Page();
+                        $nc->setPropertiesFromArray($row);
+        		$nc->setPageIndexScore($row['cIndexScore']);
+	                                        
+                        //$nc = Page::getByID($row['cID'], 'ACTIVE');
+                    	if (!$this->displayOnlyApprovedPages) {
 				$cp = new Permissions($nc);
 				if ($cp->canViewPageVersions()) {
 					$nc->loadVersionObject('RECENT');

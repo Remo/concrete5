@@ -57,42 +57,58 @@ class Concrete5_Model_Page extends Collection {
 		
 		return $c;
 	}
+        
+        public function populatePageObject($cInfo, $where, &$r, &$row) {
+            $db = Loader::db();
+            
+            $q0 = "SELECT
+                        PagesOriginal.cID,
+                        PagesOriginal.pkgID,
+                        Pages.cPointerID,
+                        if(Pages.cPointerID>0,Pages.cID,null) cPointerOriginalID,
+                        PagesOriginal.cPointerExternalLink,
+                        PagesOriginal.cIsActive,
+                        PagesOriginal.cIsSystemPage,
+                        PagesOriginal.cPointerExternalLinkNewWindow,
+                        PagesOriginal.cFilename,
+                        Collections.cDateAdded,
+                        PagesOriginal.cDisplayOrder,
+                        Collections.cDateModified,
+                        PagesOriginal.cInheritPermissionsFromCID, 
+                        PagesOriginal.cInheritPermissionsFrom, 
+                        PagesOriginal.cOverrideTemplatePermissions, 
+                        PagesOriginal.cCheckedOutUID, 
+                        PagesOriginal.cIsTemplate, 
+                        PagesOriginal.uID, 
+                        PagePaths.cPath, 
+                        PagesOriginal.cParentID, 
+                        PagesOriginal.cChildren, 
+                        PagesOriginal.cCacheFullPageContent, PagesOriginal.cCacheFullPageContentOverrideLifetime, 
+                        PagesOriginal.cCacheFullPageContentLifetimeCustom
+                FROM Pages 
+                INNER JOIN Pages PagesOriginal ON if(Pages.cPointerID>0,Pages.cPointerID, Pages.cID)=PagesOriginal.cID
+                INNER JOIN Collections ON PagesOriginal.cID = Collections.cID
+                LEFT JOIN PagePaths ON (PagesOriginal.cID = PagePaths.cID AND PagePaths.ppIsCanonical = 1)
+                 ";
+		
+            $v = array($cInfo);
+            $r = $db->query($q0 . $where, $v);
+            $row = $r->fetchRow();
+        }
 	
 	/**
 	 * @access private
 	 */
 	protected function populatePage($cInfo, $where, $cvID) {
 		$db = Loader::db();
-		
-		$q0 = "select Pages.cID, Pages.pkgID, Pages.cPointerID, Pages.cPointerExternalLink, Pages.cIsActive, Pages.cIsSystemPage, Pages.cPointerExternalLinkNewWindow, Pages.cFilename, Collections.cDateAdded, Pages.cDisplayOrder, Collections.cDateModified, cInheritPermissionsFromCID, cInheritPermissionsFrom, cOverrideTemplatePermissions, cCheckedOutUID, cIsTemplate, uID, cPath, cParentID, cChildren, cCacheFullPageContent, cCacheFullPageContentOverrideLifetime, cCacheFullPageContentLifetimeCustom from Pages inner join Collections on Pages.cID = Collections.cID left join PagePaths on (Pages.cID = PagePaths.cID and PagePaths.ppIsCanonical = 1) ";
-		//$q2 = "select cParentID, cPointerID, cPath, Pages.cID from Pages left join PagePaths on (Pages.cID = PagePaths.cID and PagePaths.ppIsCanonical = 1) ";
-		
-		$v = array($cInfo);
-		$r = $db->query($q0 . $where, $v);
-		$row = $r->fetchRow();
-		if ($row['cPointerID'] > 0) {
-			$q1 = $q0 . "where Pages.cID = ?";
-			$cPointerOriginalID = $row['cID'];
-			$v = array($row['cPointerID']);
-			$cParentIDOverride = $row['cParentID'];
-			$cPathOverride = $row['cPath'];
-			$cPointerID = $row['cPointerID'];
-			$cDisplayOrderOverride = $row['cDisplayOrder'];
-			$r = $db->query($q1, $v);
-			$row = $r->fetchRow();
-		}
-	
+                
+                $this->populatePageObject($cInfo, $where, $r, $row);
 		if ($r) {
 			if ($row) {
 				foreach ($row as $key => $value) {
 					$this->{$key} = $value;
 				}
-				if (isset($cParentIDOverride)) {
-					$this->cPointerID = $cPointerID;
-					$this->cPointerOriginalID = $cPointerOriginalID;
-					$this->cPath = $cPathOverride;
-					$this->cParentID = $cParentIDOverride;
-				}
+                                 
 				$this->isMasterCollection = $row['cIsTemplate'];
 			} else {
 				if ($cInfo == 1) {
