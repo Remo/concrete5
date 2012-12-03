@@ -413,15 +413,18 @@ class Concrete5_Model_PageList extends DatabaseItemList {
         		$nc = new Page();
                         $nc->setPropertiesFromArray($row);
         		$nc->setPageIndexScore($row['cIndexScore']);
+                        $nc->loadPermissionAssignments();
 	                                        
-                        //$nc = Page::getByID($row['cID'], 'ACTIVE');
+                        $versionToLoad = 'ACTIVE';
                     	if (!$this->displayOnlyApprovedPages) {
-				$cp = new Permissions($nc);
-				if ($cp->canViewPageVersions()) {
-					$nc->loadVersionObject('RECENT');
-				}
+                            $versionToLoad = 'RECENT';
 			}
-			$nc->setPageIndexScore($row['cIndexScore']);
+                        $cp = new Permissions($nc);
+                        if ($cp->canViewPageVersions()) {
+                                $nc->loadVersionObject($versionToLoad);
+                        }
+
+                        $nc->setPageIndexScore($row['cIndexScore']);
 			$pages[] = $nc;
 		}
 		return $pages;

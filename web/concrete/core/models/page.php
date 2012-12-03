@@ -136,7 +136,7 @@ class Concrete5_Model_Page extends Collection {
 		unset($r);
 	}	
 	
-	protected function loadPermissionAssignments() {
+	public function loadPermissionAssignments() {
 		$db = Loader::db();
 		$r = $db->Execute('select pkID, paID from PagePermissionAssignments where cID = ?', array($this->getPermissionsCollectionID()));
 		while ($row =  $r->FetchRow()) {
