@@ -130,6 +130,21 @@
 				}
 			}
 		}
-		
+        
+        public function isHttps() {
+            if (isset($_SERVER['HTTPS'])) {
+                if (strtolower($_SERVER['HTTPS']) == 'on') {
+                    return true;
+                }
+                if ($_SERVER['HTTPS'] == '1') {
+                    return true;
+                }
+            } elseif (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == '443') {
+                return true;
+            } elseif (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) == 'https') {
+                return true;
+            }
+            return false;
+        }		
 	}
 ?>

@@ -5,7 +5,7 @@ defined('C5_EXECUTE') or die("Access Denied.");
 if (REDIRECT_TO_BASE_URL == true) {
 	$protocol = 'http://';
 	$base_url = BASE_URL;
-	if (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on')) {
+	if (Loader::helper('validation/ip')->isHttps()) {
 		$protocol = 'https://';
 		if (defined('BASE_URL_SSL')) {
 			$base_url_ssl = BASE_URL_SSL;

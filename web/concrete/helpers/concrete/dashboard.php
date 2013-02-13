@@ -209,7 +209,7 @@ class ConcreteDashboardHelper {
 			} else if ($imageSetting == 'none') {
 				$image = '';
 			} else { 
-				if (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on')) {
+				if (Loader::helper('validation/ip')->isHttps()) {
 					$image = DASHBOARD_BACKGROUND_FEED_SECURE . '/' . $filename;
 				} else {
 					$image = DASHBOARD_BACKGROUND_FEED . '/' . $filename;

@@ -1773,7 +1773,7 @@ class Concrete5_Model_Page extends Collection {
 		$cID = $this->cID;
 		$valt = Loader::helper('validation/token');
 		$token = $valt->getParameter();
-		if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on' && defined('BASE_URL_SSL')) {
+		if(Loader::helper('validation/ip')->isHttps() && defined('BASE_URL_SSL')) {
 			$str = BASE_URL_SSL . DIR_REL . "/" . DISPATCHER_FILENAME . "?cID={$cID}&" . $token;
 		} else {
 			$str = BASE_URL . DIR_REL . "/" . DISPATCHER_FILENAME . "?cID={$cID}&" . $token;
