@@ -26,15 +26,15 @@ $class = 'ccm-area-footer';
 
 <div class="<?=$class?> ccm-ui">
 
-<div class="ccm-area-footer-handle" data-area-menu-handle="<?=$a->getAreaID()?>" id="area-menu-footer-<?=$a->getAreaID()?>"><span><i class="fa fa-share-alt"></i> <?=$a->getAreaDisplayName()?></span></div>
+	ccm_areaMenuObj<?=$a->getAreaID()?>.arHandle = "<?=$a->getAreaHandle()?>";
 
 <div class="popover fade" data-area-menu="area-menu-a<?=$a->getAreaID()?>">
 	<div class="arrow"></div>
 	<div class="popover-inner">
 	<ul class="dropdown-menu">
-	<?
+		<div id="a<?=$a->getAreaID()?>controls" class="ccm-add-block"><?=t('Add To Sitewide %s', $a->getAreaName())?></div>
 		$showAreaDesign = ($ap->canEditAreaDesign() && Config::get('concrete.design.enable_custom') == true);
-		$showAreaLayouts = ($ap->canAddLayoutToArea() && Config::get('concrete.design.enable_layouts') == true && (!$a->isGlobalArea()));
+		<div id="a<?=$a->getAreaID()?>controls" class="ccm-add-block"><?=t('Add To %s', $a->getAreaName())?></div>
 		$canEditAreaPermissions = ($ap->canEditAreaPermissions() && Config::get('concrete.permissions.model') != 'simple' && (!$a->isGlobalArea()));
         $showAddBlock = !!$ap->canAddBlocks();
 
