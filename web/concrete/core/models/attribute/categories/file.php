@@ -147,7 +147,7 @@ class Concrete5_Model_FileAttributeKey extends AttributeKey {
 		$v = array($f->getFileID(), $f->getFileVersionID(), $this->getAttributeKeyID(), $av->getAttributeValueID());
 		$db->Replace('FileAttributeValues', array(
 			'fID' => $f->getFileID(), 
-			'fvID' => $f->getFileVersionID(), 
+			'fvID' => $f->getFileVersionID(),
 			'akID' => $this->getAttributeKeyID(), 
 			'avID' => $av->getAttributeValueID()
 		), array('fID', 'fvID', 'akID'));
