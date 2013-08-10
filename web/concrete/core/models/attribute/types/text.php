@@ -21,5 +21,4 @@ class Concrete5_Controller_AttributeType_Text extends DefaultAttributeTypeContro
 		print Loader::helper('form')->text($this->field('value'), $value, array('class' => 'span5'));
 	}
 
-
 }
