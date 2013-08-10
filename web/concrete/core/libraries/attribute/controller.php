@@ -6,7 +6,12 @@ defined('C5_EXECUTE') or die("Access Denied.");
 		protected $identifier;
 		protected static $sets = array();
 	 	protected $attributeKey;
-		protected $requestArray = false;
+		protected $requestArray = false;		
+		protected $callingObject = false;
+
+		public function setCallingObject($callingObject) {			
+			$this->callingObject = $callingObject;
+		}
 		
 		public function setRequestArray($array) {
 			$this->requestArray = $array;
@@ -19,7 +24,11 @@ defined('C5_EXECUTE') or die("Access Denied.");
 	 	public function setAttributeValue($attributeValue) {
 	 		$this->attributeValue = $attributeValue;
 	 	}
-	 	
+		
+		public function getCallingObject() {
+			return $this->callingObject;
+		}
+	
 	 	public function getAttributeKey() {
 	 		return $this->attributeKey;
 	 	}
