@@ -96,6 +96,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-cssmin');
 	grunt.loadNpmTasks('grunt-contrib-less');
+        grunt.loadNpmTasks('grunt-phpmd');
 
 	// Now let's build the final configuration for Grunt.
 	var extend = require('util')._extend;
@@ -135,6 +136,15 @@ module.exports = function(grunt) {
 			files: css
 		}
 	};
+        
+        config.phpmd = {
+            application: {
+                dir: '../web'
+            },
+            options: {
+                rulesets: 'codesize'
+            }
+        };
 	
 	// Set base tasks
 	grunt.initConfig(config);
@@ -148,6 +158,8 @@ module.exports = function(grunt) {
 	
 	grunt.registerTask('debug', ['js:debug', 'css:debug']);
 	grunt.registerTask('release', ['js:release', 'css:release']);
+        
+        grunt.registerTask('messdetector', 'phpmd');
 
 	grunt.registerTask('default', 'release');
 };
