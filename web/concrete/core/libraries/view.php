@@ -773,7 +773,9 @@ defined('C5_EXECUTE') or die("Access Denied.");
 
 			$wrapTemplateInTheme = false;
 			$this->checkMobileView();
-			Events::fire('on_start', $this);
+			if (defined('DB_DATABASE') && ($view !== '/upgrade')) {
+				Events::fire('on_start', $this);
+			}
 			
 			// Extract controller information from the view, and put it in the current context
 			if (!isset($this->controller)) {
@@ -948,9 +950,11 @@ defined('C5_EXECUTE') or die("Access Denied.");
 			if (ob_get_level() > OB_INITIAL_LEVEL) {
 				ob_end_clean();
 			}
-			
-			Events::fire('on_before_render', $this);
-			
+
+			if (defined('DB_DATABASE') && ($view !== '/upgrade')) {
+				Events::fire('on_before_render', $this);
+			}
+						
 			if (defined('APP_CHARSET')) {
 				header("Content-Type: text/html; charset=" . APP_CHARSET);
 			}
@@ -986,7 +990,9 @@ defined('C5_EXECUTE') or die("Access Denied.");
 				throw new Exception(t('File %s not found. All themes need default.php and view.php files in them. Consult concrete5 documentation on how to create these files.', $this->theme));
 			}
 			
-			Events::fire('on_render_complete', $this);
+			if (defined('DB_DATABASE') && ($view !== '/upgrade')) {
+				Events::fire('on_render_complete', $this);
+			}
 			
 			if (ob_get_level() == OB_INITIAL_LEVEL) {
 				require(DIR_BASE_CORE . '/startup/jobs.php');

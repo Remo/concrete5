@@ -70,9 +70,13 @@ foreach($permissions as $pk) {
 <script type="text/javascript">
 
 ccm_permissionLaunchDialog = function(link) {
+	var dupe = $(link).attr('data-duplicate');
+	if (dupe != 1) {
+		dupe = 0;
+	}
 	jQuery.fn.dialog.open({
 		title: $(link).attr('dialog-title'),
-		href: '<?=REL_DIR_FILES_TOOLS_REQUIRED?>/edit_block_popup?bID=<?=$b->getBlockID()?>&arHandle=<?=urlencode($b->getAreaHandle())?>&cvID=<?=$c->getVersionID()?>&bID=<?=$b->getBlockID()?>&cID=<?=$c->getCollectionID()?>&btask=set_advanced_permissions&pkID=' + $(link).attr('data-pkID') + '&paID=' + $(link).attr('data-paID'),
+		href: '<?=REL_DIR_FILES_TOOLS_REQUIRED?>/edit_block_popup?duplicate=' + dupe + '&bID=<?=$b->getBlockID()?>&arHandle=<?=urlencode($b->getAreaHandle())?>&cvID=<?=$c->getVersionID()?>&bID=<?=$b->getBlockID()?>&cID=<?=$c->getCollectionID()?>&btask=set_advanced_permissions&pkID=' + $(link).attr('data-pkID') + '&paID=' + $(link).attr('data-paID'),
 		modal: false,
 		width: 500,
 		height: 380
@@ -86,6 +90,7 @@ $(function() {
 		},
 		
 		success: function(r) {
+			ccm_mainNavDisableDirectExit();
 			jQuery.fn.dialog.hideLoader();
 			jQuery.fn.dialog.closeTop();
 		}		
@@ -95,6 +100,7 @@ $(function() {
 ccm_revertToAreaPermissions = function() {
 	jQuery.fn.dialog.showLoader();
 	$.get('<?=$pk->getPermissionAssignmentObject()->getPermissionKeyToolsURL("revert_to_area_permissions")?>&bID=<?=$b->getBlockID()?>&cvID=<?=$c->getVersionID()?>&arHandle=<?=urlencode($b->getAreaHandle())?>&cID=<?=$c->getCollectionID()?>', function() { 
+		ccm_mainNavDisableDirectExit();
 		ccm_refreshBlockPermissions();
 	});
 }
@@ -102,6 +108,7 @@ ccm_revertToAreaPermissions = function() {
 ccm_setBlockPermissionsToOverride = function() {
 	jQuery.fn.dialog.showLoader();
 	$.get('<?=$pk->getPermissionAssignmentObject()->getPermissionKeyToolsURL("override_area_permissions")?>&bID=<?=$b->getBlockID()?>&cvID=<?=$c->getVersionID()?>&arHandle=<?=urlencode($b->getAreaHandle())?>&cID=<?=$c->getCollectionID()?>', function() { 
+		ccm_mainNavDisableDirectExit();
 		ccm_refreshBlockPermissions();
 	});
 }
