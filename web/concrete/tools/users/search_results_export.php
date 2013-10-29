@@ -1,7 +1,7 @@
 <?
 defined('C5_EXECUTE') or die("Access Denied.");
 ini_set('memory_limit', -1);
-set_time_limit(0);
+@set_time_limit(0);
 
 $tp = new TaskPermission();
 if (!$tp->canAccessUserSearchExport()) { 

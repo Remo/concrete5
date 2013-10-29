@@ -5,7 +5,7 @@ class Concrete5_Controller_Dashboard_System_Environment_Info extends DashboardBa
 	
 	public function get_environment_info() {
 		$maxExecutionTime = ini_get('max_execution_time');
-		set_time_limit(5);
+		@set_time_limit(5);
 		
 		$environmentMessage = '# ' . t('concrete5 Version') . "\n" . APP_VERSION . "\n\n";
 		$environmentMessage .= '# ' . t('concrete5 Packages') . "\n";

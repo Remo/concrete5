@@ -85,7 +85,7 @@ class Concrete5_Controller_Dashboard_System_BackupRestore_Backup extends Dashboa
 	}
 
 	public function restore_backup() {
-		set_time_limit(0);
+		@set_time_limit(0);
 		$tp = new TaskPermission();
 		  if (!$tp->canBackup()) {
 			return false;
