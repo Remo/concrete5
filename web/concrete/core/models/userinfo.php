@@ -196,9 +196,15 @@ defined('C5_EXECUTE') or die("Access Denied.");
 			Loader::model('attribute/categories/user');
 			while ($row = $r->FetchRow()) {
 				$uak = UserAttributeKey::getByID($row['akID']);
-				$av = $this->getAttributeValueObject($uak);
-				if (is_object($av)) {
-					$av->delete();
+				if (is_object($uak)) {
+					$av = $this->getAttributeValueObject($uak);
+					if (is_object($av)) {
+						$av->delete();
+					}
+					$cnt = $uak->getController();
+					if (is_object($cnt)) {
+						$cnt->deleteKey();
+					}
 				}
 			}
 

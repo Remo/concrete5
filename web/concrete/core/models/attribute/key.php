@@ -459,11 +459,9 @@ class Concrete5_Model_AttributeKey extends Object {
 		}
 	}
 	
-	public function delete() {
-		$at = $this->getAttributeType();
-		$at->controller->setAttributeKey($this);
-		$at->controller->deleteKey();
+	public function delete() {		
 		$cnt = $this->getController();
+		$cnt->deleteKey();
 		
 		$db = Loader::db();
 		$db->Execute('delete from AttributeKeys where akID = ?', array($this->getAttributeKeyID()));

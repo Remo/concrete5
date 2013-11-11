@@ -325,10 +325,14 @@
 			$r = $db->Execute('select avID, akID from CollectionAttributeValues where cID = ? and cvID = ?', array($cID, $cvID));
 			Loader::model('attribute/categories/collection');			
 			while ($row = $r->FetchRow()) {
-				$cak = CollectionAttributeKey::getByID($row['akID']);
+				$cak = CollectionAttributeKey::getByID($row['akID']);				
 				$cav = $c->getAttributeValueObject($cak);
 				if (is_object($cav)) {
 					$cav->delete();
+				}
+				$cnt = $cak->getController();
+				if (is_object($cnt)) {
+					$cnt->deleteKey();
 				}
 			}
 			
