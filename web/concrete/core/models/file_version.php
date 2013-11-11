@@ -339,6 +339,21 @@ class Concrete5_Model_FileVersion extends Object {
 		}
 
 		$db = Loader::db();
+		
+		$r = $db->Execute('select avID, akID from FileAttributeValues where fID = ? and fvID = ?', array($this->fID, $this->fvID));
+		Loader::model('attribute/categories/file');			
+		while ($row = $r->FetchRow()) {
+			$fak = FileAttributeKey::getByID($row['akID']);				
+			$fav = $c->getAttributeValueObject($fak);
+			if (is_object($fav)) {
+				$fav->delete();
+			}
+			$cnt = $fak->getController();
+			if (is_object($cnt)) {
+				$cnt->deleteKey();
+			}
+		}
+			
 		// now from the DB
 		$db->Execute("delete from FileVersions where fID = ? and fvID = ?", array($this->fID, $this->fvID));
 		$db->Execute("delete from FileAttributeValues where fID = ? and fvID = ?", array($this->fID, $this->fvID));

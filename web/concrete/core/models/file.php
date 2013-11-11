@@ -372,7 +372,7 @@ class Concrete5_Model_File extends Object {
 		// first, we remove all files from the drive
 		$db = Loader::db();
 		$pathbase = false;
-		$r = $db->GetAll('select fvFilename, fvPrefix from FileVersions where fID = ?', array($this->fID));
+		$r = $db->GetAll('select fID, fvID, fvFilename, fvPrefix from FileVersions where fID = ?', array($this->fID));
 		$h = Loader::helper('concrete/file');
 		Loader::model('file_storage_location');
 		if ($this->getStorageLocationID() > 0) {
@@ -388,6 +388,20 @@ class Concrete5_Model_File extends Object {
 				$val['fvPrefix']
 			));
 			if ($cnt == 0) {
+				$r = $db->Execute('select avID, akID from FileAttributeValues where fID = ? and fvID = ?', array($val['fID'], $val['fvID']));
+				Loader::model('attribute/categories/file');			
+				while ($row = $r->FetchRow()) {					
+					$fak = FileAttributeKey::getByID($row['akID']);				
+					$fav = $this->getAttributeValueObject($fak);
+					if (is_object($fav)) {
+						$fav->delete();
+					}
+					$cnt = $fak->getController();
+					if (is_object($cnt)) {
+						$cnt->deleteKey();
+					}
+				}
+
 				if ($pathbase != false) {
 					$path = $h->mapSystemPath($val['fvPrefix'], $val['fvFilename'], false, $pathbase);
 				} else {
