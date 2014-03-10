@@ -101,11 +101,6 @@ class ConcreteUpgradeVersion560Helper {
 			$bt->refresh();
 		}
 
-		$bt = BlockType::getByHandle('search');
-		if (is_object($bt)) {
-			$bt->refresh();
-		}
-
 		$sp = Page::getByPath('/dashboard/users/group_sets');
 		if ($sp->isError()) {
 			$d11 = SinglePage::add('/dashboard/users/group_sets');

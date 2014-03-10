@@ -12,7 +12,7 @@ class Concrete5_Model_PermissionKeyCategory extends Object {
 		return self::$categories[$pkCategoryID];
 	}
 
-	protected static function populateCategories() {
+	protected function populateCategories() {
 		$db = Loader::db();
 		self::$categories = array();
 		$r = $db->Execute('select pkCategoryID, pkCategoryHandle, pkgID from PermissionKeyCategories');
@@ -29,7 +29,7 @@ class Concrete5_Model_PermissionKeyCategory extends Object {
 			self::populateCategories();
 		}
 
-		return array_key_exists($pkCategoryHandle, self::$categories) ? self::$categories[$pkCategoryHandle] : false;
+		return self::$categories[$pkCategoryHandle];
 	}
 	
 	public function handleExists($pkHandle) {

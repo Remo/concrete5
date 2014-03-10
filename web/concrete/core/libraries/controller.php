@@ -20,8 +20,6 @@ defined('C5_EXECUTE') or die("Access Denied.");
  */
 class Concrete5_Library_Controller {
 
-	public $renderOverride;
-
 	public $theme = null;
 	/*
 	 * an array of items set by the set() method.
@@ -71,7 +69,8 @@ class Concrete5_Library_Controller {
 			$this->helpers[] = 'html';
 		}
 		foreach($this->helpers as $h) {
-			$this->helperObjects[(str_replace('/','_',$h))] = Loader::helper($h);
+			$$h = Loader::helper($h);
+			$this->helperObjects[(str_replace('/','_',$h))] = $$h;
 		}		
 	}	
 	
@@ -110,7 +109,6 @@ class Concrete5_Library_Controller {
 		// grab the whole shebang
 		$taskparts = explode('/', $task);
 		
-		$method = '';
 		if (isset($taskparts[0]) && $taskparts[0] != '') {
 			$method = $taskparts[0];
 		}

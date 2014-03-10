@@ -5,11 +5,6 @@ class Concrete5_Library_Queue {
 	public static function get($name, $additionalConfig = array()) {
 		Loader::library('3rdparty/Zend/Queue');
 
-		$type = 'pdo_mysql';
-		if (!extension_loaded('pdo_mysql')) {
-			$type = 'mysql';
-		}
-
 		$config = array(
 		'name' => $name,
 		'driverOptions' => array(
@@ -17,7 +12,7 @@ class Concrete5_Library_Queue {
 		'username' => DB_USERNAME,
 		'password' => DB_PASSWORD,
 		'dbname'   => DB_DATABASE,
-		'type'     => $type
+		'type'     => 'pdo_mysql'
 		)
 		);
 

@@ -21,7 +21,7 @@ defined('C5_EXECUTE') or die("Access Denied.");
 		
 		function isError() {
 			$args = func_get_args();
-			if (isset($args[0]) && $args[0]) {
+			if ($args[0]) {
 				return $this->error == $args[0];
 			} else {
 				return $this->error;
@@ -38,14 +38,14 @@ defined('C5_EXECUTE') or die("Access Denied.");
 			}
 		}
 		
-		public static function camelcase($file) {
+		public function camelcase($file) {
 			// turns "asset_library" into "AssetLibrary"
 			$r1 = ucwords(str_replace(array('_', '-', '/'), ' ', $file));
 			$r2 = str_replace(' ', '', $r1);
 			return $r2;		
 		}
 
-		public static function uncamelcase($string) {
+		public function uncamelcase($string) {
 			$v = preg_split('/([A-Z])/', $string, false, PREG_SPLIT_DELIM_CAPTURE);
 			$a = array();
 			array_shift($v);

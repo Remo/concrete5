@@ -4,11 +4,7 @@
 </div>
 <div class="pageSection">
 	<h1><?php echo $c->getCollectionName(); ?></h1>
-	<p class="meta"><?php echo t(
-		'Posted by %1$s on %2$s',
-		$c->getVersionObject()->getVersionAuthorUserName(),
-		$c->getCollectionDatePublic(DATE_APP_GENERIC_MDY_FULL)
-	); ?></p>		
+	<p class="meta"><?php echo t('Posted by')?> <?php echo $c->getVersionObject()->getVersionAuthorUserName(); ?> on <?php echo $c->getCollectionDatePublic('F j, Y'); ?></p>		
 </div>
 <div class="pageSection">
 	<?php $as = new Area('Main'); $as->display($c); ?>

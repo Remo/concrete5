@@ -19,7 +19,6 @@
 		protected $btExportPageColumns = array('cParentID');
 		protected $btExportPageTypeColumns = array('ctID');
 		protected $btCacheBlockRecord = true;
-		protected $btWrapperClass = 'ccm-ui';
 		
 		/** 
 		 * Used for localization. If we want to localize the name/description we have to include this
@@ -145,3 +144,5 @@
 			parent::save($args);		
 		} 
 	}
+
+?>

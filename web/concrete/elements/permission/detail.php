@@ -3,7 +3,7 @@
 <? 
 if ($_REQUEST['paID'] && $_REQUEST['paID'] > 0) { 
 	$pa = PermissionAccess::getByID($_REQUEST['paID'], $permissionKey);
-	if ($pa->isPermissionAccessInUse() || $_REQUEST['duplicate'] == '1') {
+	if ($pa->isPermissionAccessInUse()) {
 		$pa = $pa->duplicate();
 	}
 } else { 
@@ -143,10 +143,7 @@ $(function() {
 			// now we reload the permission key to use the new permission assignment
 			$('#ccm-permission-grid-cell-<?=$permissionKey->getPermissionKeyID()?>').load(
 				'<?=$permissionKey->getPermissionAssignmentObject()->getPermissionKeyToolsURL("display_access_cell")?>&paID=<?=$pa->getPermissionAccessID()?>', function() {
-					$('#ccm-permission-grid-name-<?=$permissionKey->getPermissionKeyID()?> a').attr('data-paID', '<?=$pa->getPermissionAccessID()?>');	
-					if (typeof(ccm_submitPermissionsDetailFormPost) != 'undefined') {
-						ccm_submitPermissionsDetailFormPost();
-					}
+					$('#ccm-permission-grid-name-<?=$permissionKey->getPermissionKeyID()?> a').attr('data-paID', '<?=$pa->getPermissionAccessID()?>');		
 				}
 			);
 		});

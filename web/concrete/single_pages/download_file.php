@@ -20,7 +20,7 @@ defined('C5_EXECUTE') or die("Access Denied.");
 	
 	<form action="<?= View::url('/download_file', 'submit_password', $fID) ?>" method="post">
 		<? if(isset($force)) { ?>
-			<input type="hidden" value="<?= $force ?>" name="force" />
+			<input type="hidden" value="<?=force?>" name="force" />
 		<? } ?>
 		<input type="hidden" value="<?= $rcID ?>" name="rcID"/>
 		<label for="password"><?=t('Password')?>: <input type="password" name="password" /></label>

@@ -38,7 +38,7 @@ $form = Loader::helper('form');
 			<div class="control-group">
 				<?=$form->label('MAIL_SEND_METHOD_SMTP_PASSWORD',t('Password'));?>
 				<div class="controls">
-					<?=$form->password('MAIL_SEND_METHOD_SMTP_PASSWORD', Config::get('MAIL_SEND_METHOD_SMTP_PASSWORD'), array('autocomplete' => 'off'))?>
+					<?=$form->text('MAIL_SEND_METHOD_SMTP_PASSWORD', Config::get('MAIL_SEND_METHOD_SMTP_PASSWORD'))?>
 				</div>
 			</div>
 			

@@ -176,11 +176,9 @@ class Concrete5_Controller_Upgrade extends Controller {
 		if (version_compare($sav, '5.6.2', '<')) { 
 			$ugvs[] = "version_562";
 		}
-		
+
 		if (version_compare($sav, '5.6.3', '<')) { 
 			$ugvs[] = "version_563";
-		}
-
 
 		foreach($ugvs as $ugh) {
 			$this->upgrades[] = Loader::helper('concrete/upgrade/' . $ugh);
@@ -241,20 +239,19 @@ class Concrete5_Controller_Upgrade extends Controller {
 		try {
 			Cache::flush();
 			$this->set_upgrades();
-
 			foreach($this->upgrades as $ugh) {
 				if (method_exists($ugh, 'prepare')) {
 					$prepareMessages[] =$ugh->prepare($this);
 				}
-
 				if (isset($ugh->dbRefreshTables) && count($ugh->dbRefreshTables) > 0) {
 					$this->refreshDatabaseTables($ugh->dbRefreshTables);
 				}
-
+			}
+			
+			foreach($this->upgrades as $ugh) {
 				if (method_exists($ugh, 'run')) {
 					$runMessages[] = $ugh->run();
 				}
-
 			}
 			
 			$message = '';

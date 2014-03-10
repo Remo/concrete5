@@ -2,16 +2,7 @@
 defined('C5_EXECUTE') or die("Access Denied.");
 class Concrete5_Model_PermissionCache {
 	
-	static $enabled = true;
-
-	public static function disable() {
-		PermissionCache::$enabled = false;
-	}
-	
 	public static function getResponse($object) {
-		if (!PermissionCache::$enabled) {
-			return false;
-		}
 		$cl = CacheLocal::get();
 		if ($cl->enabled) {
 			$identifier = 'pr:' . get_class($object) . ':' . $object->getPermissionObjectIdentifier();
@@ -22,9 +13,6 @@ class Concrete5_Model_PermissionCache {
 	}
 
 	public static function addResponse($object, PermissionResponse $pr) {
-		if (!PermissionCache::$enabled) {
-			return false;
-		}
 		$cl = CacheLocal::get();
 		if ($cl->enabled) {
 			$identifier = 'pr:' . get_class($object) . ':' . $object->getPermissionObjectIdentifier();
@@ -33,12 +21,10 @@ class Concrete5_Model_PermissionCache {
 	}
 
 	public static function getPermissionAccessObject($paID, PermissionKey $pk) {
-		if (!PermissionCache::$enabled) {
-			return false;
-		}
 		$cl = CacheLocal::get();
 		if ($cl->enabled) {
-			$identifier = 'pao:' . $pk->getPermissionKeyID() . ':' . $paID;
+			$class = str_replace('PermissionKey', 'PermissionAccess', get_class($pk));
+			$identifier = 'pao:' . $class . ':' . $paID;
 			if (array_key_exists($identifier, $cl->cache)) {
 				return $cl->cache[$identifier];
 			}
@@ -46,20 +32,15 @@ class Concrete5_Model_PermissionCache {
 	}
 
 	public static function addPermissionAccessObject($paID, PermissionKey $pk, $obj) {
-		if (!PermissionCache::$enabled) {
-			return false;
-		}
 		$cl = CacheLocal::get();
 		if ($cl->enabled) {
-			$identifier = 'pao:' . $pk->getPermissionKeyID() . ':' . $paID;
+			$class = str_replace('PermissionKey', 'PermissionAccess', get_class($pk));
+			$identifier = 'pao:' . $class . ':' . $paID;
 			$cl->cache[$identifier] = $obj;
 		}
 	}
 	
-	public static function validate(PermissionKey $pk) {
-		if (!PermissionCache::$enabled) {
-			return -1;
-		}
+	public function validate(PermissionKey $pk) {
 		$cl = CacheLocal::get();
 		if (!$cl->enabled) {
 			return -1;
@@ -80,9 +61,6 @@ class Concrete5_Model_PermissionCache {
 	}
 
 	public static function addValidate(PermissionKey $pk, $valid) {
-		if (!PermissionCache::$enabled) {
-			return false;
-		}
 		$cl = CacheLocal::get();
 		if ($cl->enabled) {
 			$object = $pk->getPermissionObject();
@@ -96,9 +74,6 @@ class Concrete5_Model_PermissionCache {
 	}
 	
 	public static function addAccessObject(PermissionKey $pk, $object, $pa) {
-		if (!PermissionCache::$enabled) {
-			return false;
-		}
 		$cl = CacheLocal::get();
 		if ($cl->enabled) {
 			$identifier = 'pka:' . $pk->getPermissionKeyHandle() . ':' . $object->getPermissionObjectIdentifier();
@@ -107,9 +82,6 @@ class Concrete5_Model_PermissionCache {
 	}
 
 	public static function clearAccessObject(PermissionKey $pk, $object) {
-		if (!PermissionCache::$enabled) {
-			return false;
-		}
 		$cl = CacheLocal::get();
 		if ($cl->enabled) {
 			$identifier = 'pka:' . $pk->getPermissionKeyHandle() . ':' . $object->getPermissionObjectIdentifier();
@@ -118,9 +90,6 @@ class Concrete5_Model_PermissionCache {
 	}
 
 	public static function getAccessObject($pk, $object) {
-		if (!PermissionCache::$enabled) {
-			return false;
-		}
 		$cl = CacheLocal::get();
 		if ($cl->enabled) {
 			$identifier = 'pka:' . $pk->getPermissionKeyHandle() . ':' . $object->getPermissionObjectIdentifier();

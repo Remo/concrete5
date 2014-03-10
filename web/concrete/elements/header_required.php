@@ -27,7 +27,7 @@ if (is_object($c)) {
 			$pageTitle = sprintf(PAGE_TITLE_FORMAT, SITE, $pageTitle);
 		}
 	}
-	$pageDescription = (!isset($pageDescription) || !$pageDescription) ? $c->getCollectionDescription() : $pageDescription;
+	$pageDescription = (!$pageDescription) ? $c->getCollectionDescription() : $pageDescription;
 	$cID = $c->getCollectionID(); 
 	$isEditMode = ($c->isEditMode()) ? "true" : "false";
 	$isArrangeMode = ($c->isArrangeMode()) ? "true" : "false";

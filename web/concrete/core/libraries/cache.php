@@ -2,7 +2,7 @@
 
 class Concrete5_Library_Cache {
 	
-	public static function key($type, $id) {
+	public function key($type, $id) {
 		return md5($type . $id);
 	}
 	

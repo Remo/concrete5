@@ -29,18 +29,17 @@
 		
 		public function getSearchableContent() {
 			$b = Block::getByID($this->bOriginalID);
-			$bc = ($b) ? $b->getInstance() : false;
-			
-			if ($bc && method_exists($bc, 'getSearchableContent')) {
+			$bc = $b->getInstance();
+			if (method_exists($bc, 'getSearchableContent')) {
 				return $bc->getSearchableContent();
 			}
 		}
 
-		public function on_page_view($page) {
+		public function on_page_view() {
 			$b = Block::getByID($this->bOriginalID);
 			$bc = $b->getInstance();
 			if (method_exists($bc, 'on_page_view')) {
-				$bc->on_page_view($page);
+				$bc->on_page_view();
 			}
 		}
 
