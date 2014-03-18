@@ -705,7 +705,15 @@ class Concrete5_Model_Page extends Collection {
 	public function export($pageNode) {
 		$p = $pageNode->addChild('page');
 		$p->addAttribute('name', Loader::helper('text')->entities($this->getCollectionName()));
-		$p->addAttribute('path', $this->getCollectionPath());
+		
+		// external links don't have a proper path, we have to build it manually
+		$path = $this->getCollectionPath();
+		if ($this->isExternalLink()) {
+			$path = Page::getByID($this->getCollectionParentID())->getCollectionPath() . '/' . $this->getCollectionName();
+			$p->addAttribute('externallink', $this->getCollectionPointerExternalLink());
+			$p->addAttribute('newwindow', $this->openCollectionPointerExternalLinkInNewWindow());			
+		}
+		$p->addAttribute('path', $path);
 		$p->addAttribute('filename', $this->getCollectionFilename());
 		$p->addAttribute('pagetype', $this->getCollectionTypeHandle());
 		$p->addAttribute('description', Loader::helper('text')->entities($this->getCollectionDescription()));
