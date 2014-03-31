@@ -29,6 +29,7 @@ class Concrete5_Helper_Mail {
 	public $body = '';
 	protected $template; 
 	protected $bodyHTML = false;
+	protected $testing = false;
 	
 	
 	/**
@@ -42,12 +43,14 @@ class Concrete5_Helper_Mail {
 		$this->to = array();
 		$this->cc = array();
 		$this->bcc = array();
+		$this->replyto = array();
 		$this->from = array();
 		$this->data = array();
 		$this->subject = '';
 		$this->body = '';
 		$this->template; 
 		$this->bodyHTML = false;
+		$this->testing = false;
 	}
 	
 	
@@ -162,6 +165,11 @@ class Concrete5_Helper_Mail {
 	 */
 	public function getBody() {return $this->body;}
 	
+	/**
+	 * Returns the message's html body
+	 * @return string
+	 */
+	public function getBodyHTML() {return $this->bodyHTML;}
 	
 	/**
 	 * manually set the HTML portion of a MIME encoded message, can also be done by setting $bodyHTML in a mail template
@@ -285,7 +293,18 @@ class Concrete5_Helper_Mail {
 			$this->replyto[] = array($email, $name);	
 		}
 	}
-		
+	/** Set the testing state (if true the email logging never occurs and sending errors will throw an exception)
+	* @param bool $testing
+	*/
+	public function setTesting($testing) {
+		$this->testing = $testing ? true : false;
+	}
+	/** Retrieve the testing state
+	* @return boolean
+	*/
+	public function getTesting() {
+		return $this->testing;
+	}
 	/** 
 	 * Sends the email
 	 * @return void
@@ -349,6 +368,9 @@ class Concrete5_Helper_Mail {
 				$mail->send($transport);
 					
 			} catch(Exception $e) {
+				if($this->getTesting()) {
+					throw $e;
+				}
 				$l = new Log(LOG_TYPE_EXCEPTIONS, true, true);
 				$l->write(t('Mail Exception Occurred. Unable to send mail: ') . $e->getMessage());
 				$l->write($e->getTraceAsString());
@@ -367,7 +389,7 @@ class Concrete5_Helper_Mail {
 		}
 		
 		// add email to log
-		if (ENABLE_LOG_EMAILS) {
+		if (ENABLE_LOG_EMAILS && !$this->getTesting()) {
 			$l = new Log(LOG_TYPE_EMAILS, true, true);
 			if (ENABLE_EMAILS) {
 				$l->write('**' . t('EMAILS ARE ENABLED. THIS EMAIL WAS SENT TO mail()') . '**');
@@ -400,5 +422,3 @@ class Concrete5_Helper_Mail {
 	}
 	
 }
-
-?>

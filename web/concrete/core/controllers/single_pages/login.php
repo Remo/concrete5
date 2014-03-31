@@ -24,26 +24,7 @@ class Concrete5_Controller_Login extends Controller {
 		$languages = array();
 		$locales = array();
 		if (Config::get('LANGUAGE_CHOOSE_ON_LOGIN')) {
-			Loader::library('3rdparty/Zend/Locale');
-			Loader::library('3rdparty/Zend/Locale/Data');
-			$languages = Localization::getAvailableInterfaceLanguages();
-			if (count($languages) > 0) {
-				array_unshift($languages, 'en_US');
-			}
-			$locales = array();
-			Zend_Locale_Data::setCache(Cache::getLibrary());
-			foreach($languages as $lang) {
-				$loc = new Zend_Locale($lang);
-				$locales[$lang] = Zend_Locale::getTranslation($loc->getLanguage(), 'language', $lang);
-				$locRegion = $loc->getRegion();
-				if($locRegion !== false) {
-					$locRegionName = $loc->getTranslation($loc->getRegion(), 'country', $lang);
-					if($locRegionName !== false) {
-						$locales[$lang] .= ' (' . $locRegionName . ')';
-					}
-				}
-			}
-			asort($locales);
+			$locales = Localization::getAvailableInterfaceLanguageDescriptions();
 			$locales = array_merge(array('' => t('** Default')), $locales);
 		}
 		$this->locales = $locales;
@@ -464,11 +445,15 @@ class Concrete5_Controller_Login extends Controller {
 			$mh->to($oUser->getUserEmail());
 
 			//generate hash that'll be used to authenticate user, allowing them to change their password
+			$uHash = UserValidationHash::add($oUser->getUserID(), UVTYPE_CHANGE_PASSWORD);
+			/*
 			$h = Loader::helper('validation/identifier');
 			$uHash = $h->generate('UserValidationHashes', 'uHash');
 			$db = Loader::db();
 			$db->Execute("DELETE FROM UserValidationHashes WHERE uID=?", array( $oUser->uID ) );
 			$db->Execute("insert into UserValidationHashes (uID, uHash, uDateGenerated, type) values (?, ?, ?, ?)", array($oUser->uID, $uHash, time(),intval(UVTYPE_CHANGE_PASSWORD)));
+			*/
+			
 			$changePassURL=BASE_URL . View::url('/login', 'change_password', $uHash);
 			$mh->addParameter('changePassURL', $changePassURL);
 

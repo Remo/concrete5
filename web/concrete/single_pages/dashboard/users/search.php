@@ -57,7 +57,7 @@ function printAttributeRow($ak, $uo, $assignment) {
 
 	$html = '
 	<tr>
-		<td width="250">' . $ak->getAttributeKeyDisplayName() . '</th>
+		<th width="250">' . $ak->getAttributeKeyDisplayName() . '</th>
 		<td class="ccm-attribute-editable-field-central" colspan="2">' . $text . '</td>
 	</tr>';	
 	}
@@ -229,8 +229,8 @@ if (is_object($uo)) {
             <? } ?>
             
             <?
-                $languages = Localization::getAvailableInterfaceLanguages();
-                if (count($languages) > 0) { ?>
+                $locales = Localization::getAvailableInterfaceLanguageDescriptions(ACTIVE_LOCALE);
+                if (count($locales) > 1) { // "> 1" because en_US is always available ?>
                 <tr>
                     <td colspan="2"><strong><?=t('Default Language')?></strong></td>
                 </tr>	
@@ -239,16 +239,7 @@ if (is_object($uo)) {
                     <?
 						$ux = $uo->getUserObject();
                     	if ($assignment->allowEditDefaultLanguage()) { 
-							array_unshift($languages, 'en_US');
-							$locales = array();
-							Loader::library('3rdparty/Zend/Locale');
-							Loader::library('3rdparty/Zend/Locale/Data');
-							$locales[''] = t('** Default');
-							Zend_Locale_Data::setCache(Cache::getLibrary());
-							foreach($languages as $lang) {
-								$loc = new Zend_Locale($lang);
-								$locales[$lang] = Zend_Locale::getTranslation($loc->getLanguage(), 'language', $lang);
-							}
+							$locales = array_merge(array('' => t('** Default')), $locales);
 							print $form->select('uDefaultLanguage', $locales, $ux->getUserDefaultLanguage());
 						} else {
 							print $ux->getUserDefaultLanguage();
