@@ -7,6 +7,8 @@ var menuHTML = '';
 <?
 /* @var $jh JsonHelper */
 $jh = Loader::helper('json');
+/* @var $datehelper DateHelper */
+$datehelper = Loader::helper('date');
 
 Loader::library('3rdparty/mobile_detect');
 $md = new Mobile_Detect();
@@ -95,7 +97,7 @@ foreach($items as $ih) {
 <? if ($dh->canRead()) { ?>
 	menuHTML += '<li><a class="ccm-icon-dashboard ccm-menu-icon" id="ccm-nav-dashboard<? if ($md->isMobile()) { ?>-mobile<? } ?>" href="<?=View::url('/dashboard')?>">' + <?=$jh->encode(t('Dashboard'))?> + '</a></li>';
 <? } ?>
-menuHTML += '<li id="ccm-nav-intelligent-search-wrapper"><input type="search" placeholder="<?=t('Intelligent Search')?>" id="ccm-nav-intelligent-search" tabindex="1" /></li>';
+menuHTML += '<li id="ccm-nav-intelligent-search-wrapper"><input type="search" placeholder="' + <?=$jh->encode(t('Intelligent Search'))?> + '" id="ccm-nav-intelligent-search" tabindex="1" /></li>';
 menuHTML += '<li><a id="ccm-nav-sign-out" class="ccm-icon-sign-out ccm-menu-icon" href="<?=View::url('/login', 'logout')?>">' + <?=$jh->encode(t('Sign Out'))?> + '</a></li>';
 menuHTML += '</ul>';
 
@@ -117,7 +119,7 @@ menuHTML += '<div class="ccm-edit-overlay-actions">';
 menuHTML += '<a href="javascript:void(0)" onclick="window.location.href=\'<?=DIR_REL?>/<?=DISPATCHER_FILENAME?>?cID=<?=$c->getCollectionID()?>&ctask=check-in<?=$token?>\'" id="ccm-nav-exit-edit-direct" class="btn primary">' + <?=$jh->encode(t('Exit Edit Mode'))?> + '</a>';
 menuHTML += '</div>';
 menuHTML += '<span class="label notice">' + <?=$jh->encode(t('Version %s', $c->getVersionID()))?> + '</span>';
-menuHTML += <?=$jh->encode(t('Page currently in edit mode on %s', date(DATE_APP_GENERIC_MDYT)))?>;
+menuHTML += <?=$jh->encode(t('Page currently in edit mode on %s', $datehelper->formatDateTime('now', false, false)))?>;
 
 menuHTML += '</div>';
 
@@ -147,7 +149,7 @@ menuHTML += '</form><br/>';
 
 menuHTML += '</div>';
 menuHTML += '<span class="label notice">' + <?=$jh->encode(t('Version %s', $c->getVersionID()))?> + '</span>';
-menuHTML += <?=$jh->encode(t('Page currently in edit mode on %s', date(DATE_APP_GENERIC_MDYT)))?>;
+menuHTML += <?=$jh->encode(t('Page currently in edit mode on %s', $datehelper->formatDateTime('now', false, false)))?>;
 
 menuHTML += '</div>';
 
@@ -155,14 +157,14 @@ menuHTML += '</div>';
 
 menuHTML += '<div class="ccm-edit-overlay-actions">';
 <? if ($cp->canEditPageContents()) { ?>
-	menuHTML += '<a id="ccm-nav-check-out" href="<? if (!$cantCheckOut) { ?><?=DIR_REL?>/<?=DISPATCHER_FILENAME?>?cID=<?=$c->getCollectionID()?>&ctask=check-out<?=$token?><? } else { ?>javascript:void(0);<? } ?>" class="btn primary <? if ($cantCheckOut) { ?> disabled <? } ?> launch-tooltip" <? if ($cantCheckOut) { ?>title="<?=h(t('Someone has already checked this page out for editing.'))?>"<? } ?>>' + <?=$jh->encode(t('Edit this Page'))?> + '</a>';
+	menuHTML += '<a id="ccm-nav-check-out" href="<? if (!$cantCheckOut) { ?><?=DIR_REL?>/<?=DISPATCHER_FILENAME?>?cID=<?=$c->getCollectionID()?>&ctask=check-out<?=$token?><? } else { ?>javascript:void(0);<? } ?>" class="btn primary <? if ($cantCheckOut) { ?> disabled <? } ?> launch-tooltip" <? if ($cantCheckOut) { ?>title="' + <?=$jh->encode(h(t('Someone has already checked this page out for editing.')))?> + '"<? } ?>>' + <?=$jh->encode(t('Edit this Page'))?> + '</a>';
 <? } ?>
 <? if ($cp->canAddSubpage()) { ?>
-	menuHTML += '<a id="ccm-toolbar-add-subpage" dialog-width="645" dialog-modal="false" dialog-append-buttons="true" dialog-height="345" dialog-title="<?=h(t('Add a Sub-Page'))?>" href="<?=REL_DIR_FILES_TOOLS_REQUIRED?>/edit_collection_popup.php?cID=<?=$cID?>&ctask=add"class="btn">' + <?=$jh->encode(t('Add a Sub-Page'))?> + '</a>';
+	menuHTML += '<a id="ccm-toolbar-add-subpage" dialog-width="645" dialog-modal="false" dialog-append-buttons="true" dialog-height="345" dialog-title="' + <?=$jh->encode(h(t('Add a Sub-Page')))?> + '" href="<?=REL_DIR_FILES_TOOLS_REQUIRED?>/edit_collection_popup.php?cID=<?=$cID?>&ctask=add" class="btn">' + <?=$jh->encode(t('Add a Sub-Page'))?> + '</a>';
 <? } ?>
 menuHTML += '</div>';
 menuHTML += '<span class="label notice">' + <?=$jh->encode(t('Version %s', $c->getVersionID()))?> + '</span>';
-menuHTML += <?=$jh->encode(t('Page last edited on %s', $c->getCollectionDateLastModified(DATE_APP_GENERIC_MDYT)))?>;
+menuHTML += <?=$jh->encode(t('Page last edited on %s', $datehelper->formatDateTime($c->getCollectionDateLastModified(), false, false)))?>;
 
 
 <? } ?>
@@ -175,28 +177,28 @@ menuHTML += '<div id="ccm-edit-overlay-footer">';
 menuHTML += '<div class="ccm-edit-overlay-inner">';
 menuHTML += '<ul>';
 <? if ($cp->canEditPageProperties()) { ?>
-	menuHTML += '<li><a class="ccm-menu-icon ccm-icon-properties" <? if (!$c->isCheckedOut()) { ?> dialog-on-close="ccm_sitemapExitEditMode(<?=$c->getCollectionID()?>)" <? } ?> id="ccm-toolbar-nav-properties" dialog-width="640" dialog-height="<? if ($cp->canApprovePageVersions() && (!$c->isEditMode())) { ?>450<? } else { ?>390<? } ?>" dialog-append-buttons="true" dialog-modal="false" dialog-title="<?=h(t('Page Properties'))?>" href="<?=REL_DIR_FILES_TOOLS_REQUIRED?>/edit_collection_popup.php?<? if ($cp->canApprovePageVersions() && (!$c->isEditMode())) { ?>approveImmediately=1<? } ?>&cID=<?=$c->getCollectionID()?>&ctask=edit_metadata">' + <?=$jh->encode(t('Properties'))?> + '</a></li>';
+	menuHTML += '<li><a class="ccm-menu-icon ccm-icon-properties" <? if (!$c->isCheckedOut()) { ?> dialog-on-close="ccm_sitemapExitEditMode(<?=$c->getCollectionID()?>)" <? } ?> id="ccm-toolbar-nav-properties" dialog-width="640" dialog-height="<? if ($cp->canApprovePageVersions() && (!$c->isEditMode())) { ?>450<? } else { ?>390<? } ?>" dialog-append-buttons="true" dialog-modal="false" dialog-title="' + <?=$jh->encode(h(t('Page Properties')))?> + '" href="<?=REL_DIR_FILES_TOOLS_REQUIRED?>/edit_collection_popup.php?<? if ($cp->canApprovePageVersions() && (!$c->isEditMode())) { ?>approveImmediately=1<? } ?>&cID=<?=$c->getCollectionID()?>&ctask=edit_metadata">' + <?=$jh->encode(t('Properties'))?> + '</a></li>';
 <? } ?>
 <? if ($cp->canPreviewPageAsUser() && PERMISSIONS_MODEL == 'advanced') { ?>
-	menuHTML += '<li><a class="ccm-menu-icon ccm-icon-preview-as-user" <? if (!$c->isCheckedOut()) { ?> dialog-on-close="ccm_sitemapExitEditMode(<?=$c->getCollectionID()?>)" <? } ?> id="ccm-toolbar-nav-preview-as-user" dialog-width="90%" dialog-height="70%" dialog-append-buttons="true" dialog-modal="false" dialog-title="<?=h(t('View Page as Someone Else'))?>" href="<?=REL_DIR_FILES_TOOLS_REQUIRED?>/edit_collection_popup.php?cID=<?=$c->getCollectionID()?>&ctask=preview_page_as_user">' + <?=$jh->encode(t('Preview as User'))?> + '</a></li>';
+	menuHTML += '<li><a class="ccm-menu-icon ccm-icon-preview-as-user" <? if (!$c->isCheckedOut()) { ?> dialog-on-close="ccm_sitemapExitEditMode(<?=$c->getCollectionID()?>)" <? } ?> id="ccm-toolbar-nav-preview-as-user" dialog-width="90%" dialog-height="70%" dialog-append-buttons="true" dialog-modal="false" dialog-title="' + <?=$jh->encode(h(t('View Page as Someone Else')))?> + '" href="<?=REL_DIR_FILES_TOOLS_REQUIRED?>/edit_collection_popup.php?cID=<?=$c->getCollectionID()?>&ctask=preview_page_as_user">' + <?=$jh->encode(t('Preview as User'))?> + '</a></li>';
 <? } ?>
 <? if ($cp->canEditPageTheme() || $cp->canEditPageType()) { ?>
-	menuHTML += '<li><a class="ccm-menu-icon ccm-icon-design" <? if (!$c->isCheckedOut()) { ?> dialog-on-close="ccm_sitemapExitEditMode(<?=$c->getCollectionID()?>)" <? } ?> id="ccm-toolbar-nav-design" dialog-append-buttons="true" dialog-width="610" dialog-height="405" dialog-modal="false" dialog-title="<?=h(t('Design'))?>" href="<?=REL_DIR_FILES_TOOLS_REQUIRED?>/edit_collection_popup.php?cID=<?=$cID?>&ctask=set_theme">' + <?=$jh->encode(t('Design'))?> + '</a></li>';
+	menuHTML += '<li><a class="ccm-menu-icon ccm-icon-design" <? if (!$c->isCheckedOut()) { ?> dialog-on-close="ccm_sitemapExitEditMode(<?=$c->getCollectionID()?>)" <? } ?> id="ccm-toolbar-nav-design" dialog-append-buttons="true" dialog-width="610" dialog-height="405" dialog-modal="false" dialog-title="' + <?=$jh->encode(h(t('Design')))?> + '" href="<?=REL_DIR_FILES_TOOLS_REQUIRED?>/edit_collection_popup.php?cID=<?=$cID?>&ctask=set_theme">' + <?=$jh->encode(t('Design'))?> + '</a></li>';
 <? } ?>
 <? if ($cp->canEditPagePermissions()) { ?>
-	menuHTML += '<li><a class="ccm-menu-icon ccm-icon-permissions" <? if (!$c->isCheckedOut()) { ?> dialog-on-close="ccm_sitemapExitEditMode(<?=$c->getCollectionID()?>)" <? } ?> dialog-append-buttons="true" id="ccm-toolbar-nav-permissions" dialog-width="420" dialog-height="630" dialog-modal="false" dialog-title="<?=h(t('Permissions'))?>" href="<?=REL_DIR_FILES_TOOLS_REQUIRED?>/edit_collection_popup.php?&cID=<?=$cID?>&ctask=edit_permissions">' + <?=$jh->encode(t('Permissions'))?> + '</a></li>';
+	menuHTML += '<li><a class="ccm-menu-icon ccm-icon-permissions" <? if (!$c->isCheckedOut()) { ?> dialog-on-close="ccm_sitemapExitEditMode(<?=$c->getCollectionID()?>)" <? } ?> dialog-append-buttons="true" id="ccm-toolbar-nav-permissions" dialog-width="420" dialog-height="630" dialog-modal="false" dialog-title="' + <?=$jh->encode(h(t('Permissions')))?> + '" href="<?=REL_DIR_FILES_TOOLS_REQUIRED?>/edit_collection_popup.php?&cID=<?=$cID?>&ctask=edit_permissions">' + <?=$jh->encode(t('Permissions'))?> + '</a></li>';
 <? } ?>
 <? if ($cp->canViewPageVersions()) { ?>
-	menuHTML += '<li><a class="ccm-menu-icon ccm-icon-versions" <? if (!$c->isCheckedOut()) { ?> dialog-on-close="ccm_sitemapExitEditMode(<?=$c->getCollectionID()?>)" <? } ?> id="ccm-toolbar-nav-versions" dialog-width="640" dialog-height="340" dialog-modal="false" dialog-title="<?=h(t('Page Versions'))?>" id="menuVersions<?=$cID?>" href="<?=REL_DIR_FILES_TOOLS_REQUIRED?>/versions.php?cID=<?=$cID?>">' + <?=$jh->encode(t('Versions'))?> + '</a></li>';
+	menuHTML += '<li><a class="ccm-menu-icon ccm-icon-versions" <? if (!$c->isCheckedOut()) { ?> dialog-on-close="ccm_sitemapExitEditMode(<?=$c->getCollectionID()?>)" <? } ?> id="ccm-toolbar-nav-versions" dialog-width="640" dialog-height="340" dialog-modal="false" dialog-title="' + <?=$jh->encode(h(t('Page Versions')))?> + '" id="menuVersions<?=$cID?>" href="<?=REL_DIR_FILES_TOOLS_REQUIRED?>/versions.php?cID=<?=$cID?>">' + <?=$jh->encode(t('Versions'))?> + '</a></li>';
 <? } ?>
 <? if ($cp->canMoveOrCopyPage()) { ?>
-	menuHTML += '<li><a class="ccm-menu-icon ccm-icon-move-copy" id="ccm-toolbar-nav-move-copy" dialog-width="90%" dialog-height="70%" dialog-modal="false" dialog-title="<?=h(t('Move/Copy Page'))?>" href="<?=REL_DIR_FILES_TOOLS_REQUIRED?>/sitemap_search_selector?sitemap_select_mode=move_copy_delete&cID=<?=$cID?>">' + <?=$jh->encode(t('Move/Copy'))?> + '</a></li>';
+	menuHTML += '<li><a class="ccm-menu-icon ccm-icon-move-copy" id="ccm-toolbar-nav-move-copy" dialog-width="90%" dialog-height="70%" dialog-modal="false" dialog-title="' + <?=$jh->encode(h(t('Move/Copy Page')))?> + '" href="<?=REL_DIR_FILES_TOOLS_REQUIRED?>/sitemap_search_selector?sitemap_select_mode=move_copy_delete&cID=<?=$cID?>">' + <?=$jh->encode(t('Move/Copy'))?> + '</a></li>';
 <? } ?>
 <? if ($cp->canEditPageSpeedSettings()) { ?>
-	menuHTML += '<li><a class="ccm-menu-icon ccm-icon-speed-settings" <? if (!$c->isCheckedOut()) { ?> dialog-on-close="ccm_sitemapExitEditMode(<?=$c->getCollectionID()?>)" <? } ?> id="ccm-toolbar-nav-speed-settings" dialog-append-buttons="true" dialog-width="550" dialog-height="280" dialog-modal="false" dialog-title="<?=h(t('Full Page Caching'))?>" href="<?=REL_DIR_FILES_TOOLS_REQUIRED?>/edit_collection_popup.php?&cID=<?=$cID?>&ctask=edit_speed_settings">' + <?=$jh->encode(t('Full Page Caching'))?> + '</a></li>';
+	menuHTML += '<li><a class="ccm-menu-icon ccm-icon-speed-settings" <? if (!$c->isCheckedOut()) { ?> dialog-on-close="ccm_sitemapExitEditMode(<?=$c->getCollectionID()?>)" <? } ?> id="ccm-toolbar-nav-speed-settings" dialog-append-buttons="true" dialog-width="550" dialog-height="280" dialog-modal="false" dialog-title="' + <?=$jh->encode(h(t('Full Page Caching')))?> + '" href="<?=REL_DIR_FILES_TOOLS_REQUIRED?>/edit_collection_popup.php?&cID=<?=$cID?>&ctask=edit_speed_settings">' + <?=$jh->encode(t('Full Page Caching'))?> + '</a></li>';
 <? } ?>
 <? if ($cp->canDeletePage()) { ?>
-	menuHTML += '<li><a class="ccm-menu-icon ccm-icon-delete" <? if (!$c->isCheckedOut()) { ?> dialog-on-close="ccm_sitemapExitEditMode(<?=$c->getCollectionID()?>)" <? } ?>  dialog-append-buttons="true" id="ccm-toolbar-nav-delete" dialog-width="360" dialog-height="150" dialog-modal="false" dialog-title="<?=h(t('Delete Page'))?>" href="<?=REL_DIR_FILES_TOOLS_REQUIRED?>/edit_collection_popup.php?&cID=<?=$cID?>&ctask=delete">' + <?=$jh->encode(t('Delete'))?> + '</a></li>';
+	menuHTML += '<li><a class="ccm-menu-icon ccm-icon-delete" <? if (!$c->isCheckedOut()) { ?> dialog-on-close="ccm_sitemapExitEditMode(<?=$c->getCollectionID()?>)" <? } ?>  dialog-append-buttons="true" id="ccm-toolbar-nav-delete" dialog-width="360" dialog-height="150" dialog-modal="false" dialog-title="' + <?=$jh->encode(h(t('Delete Page')))?> + '" href="<?=REL_DIR_FILES_TOOLS_REQUIRED?>/edit_collection_popup.php?&cID=<?=$cID?>&ctask=delete">' + <?=$jh->encode(t('Delete'))?> + '</a></li>';
 <? } ?>
 menuHTML += '</ul>';
 menuHTML += '</div>';
@@ -300,7 +302,7 @@ $(function() {
 		
 		if (!$c->getCollectionPointerID() && !$hasPendingPageApproval) {
 			if (is_object($vo)) {
-				if (!$vo->isApproved() && !$c->isEditMode()) { ?>
+				if (!$vo->isApproved() && !$c->isEditMode() && $cp->canViewToolbar()) { ?>
 				
 					sbitem = new ccm_statusBarItem();
 					sbitem.setCSSClass('info');

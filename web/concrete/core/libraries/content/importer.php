@@ -284,11 +284,13 @@ class Concrete5_Library_Content_Importer {
 	protected function importBlockTypes(SimpleXMLElement $sx) {
 		if (isset($sx->blocktypes)) {
 			foreach($sx->blocktypes->blocktype as $bt) {
-				$pkg = ContentImporter::getPackageObject($bt['package']);
-				if (is_object($pkg)) {
-					BlockType::installBlockTypeFromPackage($bt['handle'], $pkg);
-				} else {
-					BlockType::installBlockType($bt['handle']);				
+				if (!is_object(BlockType::getByHandle((string) $bt['handle']))) {
+					$pkg = ContentImporter::getPackageObject($bt['package']);
+					if (is_object($pkg)) {
+						BlockType::installBlockTypeFromPackage((string) $bt['handle'], $pkg);
+					} else {
+						BlockType::installBlockType((string) $bt['handle']);				
+					}
 				}
 			}
 		}
@@ -477,28 +479,29 @@ class Concrete5_Library_Content_Importer {
 	protected function importPermissions(SimpleXMLElement $sx) {
 		if (isset($sx->permissionkeys)) {
 			foreach($sx->permissionkeys->permissionkey as $pk) {
-				$pkc = PermissionKeyCategory::getByHandle((string) $pk['category']);
-				$pkg = ContentImporter::getPackageObject($pk['package']);
-				$txt = Loader::helper('text');
-				$className = $txt->camelcase($pkc->getPermissionKeyCategoryHandle());
-				$c1 = $className . 'PermissionKey';
-				$pkx = call_user_func(array($c1, 'import'), $pk);	
-				if (isset($pk->access)) {
-					foreach($pk->access->children() as $ch) {
-						if ($ch->getName() == 'group') {
-							$g = Group::getByName($ch['name']);
-							if (!is_object($g)) {
-								$g = Group::add($g['name'], $g['description']);
+				if (!is_object(PermissionKey::getByHandle((string)$pk['handle']))) {
+					$pkc = PermissionKeyCategory::getByHandle((string) $pk['category']);
+					$pkg = ContentImporter::getPackageObject($pk['package']);
+					$txt = Loader::helper('text');
+					$className = $txt->camelcase($pkc->getPermissionKeyCategoryHandle());
+					$c1 = $className . 'PermissionKey';
+					$pkx = call_user_func(array($c1, 'import'), $pk);	
+					if (isset($pk->access)) {
+						foreach($pk->access->children() as $ch) {
+							if ($ch->getName() == 'group') {
+								$g = Group::getByName($ch['name']);
+								if (!is_object($g)) {
+									$g = Group::add($g['name'], $g['description']);
+								}
+								$pae = GroupPermissionAccessEntity::getOrCreate($g);
+								$pa = PermissionAccess::create($pkx);
+								$pa->addListItem($pae);
+								$pt = $pkx->getPermissionAssignmentObject();
+								$pt->assignPermissionAccess($pa);
 							}
-							$pae = GroupPermissionAccessEntity::getOrCreate($g);
-							$pa = PermissionAccess::create($pkx);
-							$pa->addListItem($pae);
-							$pt = $pkx->getPermissionAssignmentObject();
-							$pt->assignPermissionAccess($pa);
 						}
 					}
 				}
-			
 			}
 		}
 	}
@@ -517,14 +520,19 @@ class Concrete5_Library_Content_Importer {
 	
 	protected function importAttributes(SimpleXMLElement $sx) {
 		if (isset($sx->attributekeys)) {
+			$db = Loader::db();
 			foreach($sx->attributekeys->attributekey as $ak) {
-				$akc = AttributeKeyCategory::getByHandle($ak['category']);
-				$pkg = ContentImporter::getPackageObject($ak['package']);
-				$type = AttributeType::getByHandle($ak['type']);
-				$txt = Loader::helper('text');
-				$className = $txt->camelcase($akc->getAttributeKeyCategoryHandle());
-				$c1 = $className . 'AttributeKey';
-				$ak = call_user_func(array($c1, 'import'), $ak);				
+				$akID = $db->GetOne('select akID from AttributeKeys where akHandle = ?', array($ak['handle']));
+				
+				if (!$akID) {
+					$akc = AttributeKeyCategory::getByHandle($ak['category']);
+					$pkg = ContentImporter::getPackageObject($ak['package']);
+					$type = AttributeType::getByHandle($ak['type']);
+					$txt = Loader::helper('text');
+					$className = $txt->camelcase($akc->getAttributeKeyCategoryHandle());
+					$c1 = $className . 'AttributeKey';
+					$ak = call_user_func(array($c1, 'import'), $ak);
+				}
 			}
 		}
 	}
